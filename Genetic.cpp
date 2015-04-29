@@ -9,7 +9,7 @@
 
 Genetic::Genetic(int populationSize, double mutationProbability)
     : populationSize(populationSize),
-      nnSizes({Game2048::fieldWidth * Game2048::fieldHeight, 20, 10, 10, 10, MOV_COUNT}),
+      nnSizes({Game2048::fieldWidth * Game2048::fieldHeight, 10, 10, MOV_COUNT}),
       chromosomeSize(0),
       mutationProbability(mutationProbability),
       currentChromosomeId(-1) {
@@ -124,9 +124,14 @@ int Genetic::getCurrentChromosomeId() const
     return currentChromosomeId;
 }
 
-const Pool &Genetic::getPopulation() const
+Pool Genetic::getPopulation() const
 {
     return pool;
+}
+
+void Genetic::mutateCurrent()
+{
+    pool[currentChromosomeId].mutate(mutationProbability);
 }
 
 void Genetic::newGeneration() {
@@ -136,8 +141,8 @@ void Genetic::newGeneration() {
     
     size_t middle = pool.size() / 7;
     for (size_t i = middle; i < pool.size(); ++i) {
-        auto& c1 = pool[randAB(0, middle)];
-        auto& c2 = pool[randAB(0, middle)];
+        auto& c1 = pool[randABexp(0, pool.size())];
+        auto& c2 = pool[randABexp(0, pool.size())];
 
         pool[i] = Chromosome::crossover(c1, c2);
         pool[i].mutate(mutationProbability);

@@ -32,7 +32,7 @@ private:
 
 public slots:
     void renderField(Game2048::Board board);
-    void renderStats(const Pool &pool);
+    void renderStats(Pool pool);
     void renderCheckboxStateChanged(int state);
 };
 

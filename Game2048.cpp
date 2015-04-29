@@ -6,7 +6,7 @@
 using namespace std;
 
 Game2048::Game2048(Genetic& genetic, QObject *parent)
-    : genetic(genetic), QObject(parent),
+    : QObject(parent), genetic(genetic),
       done( false ), win( false ), moved( true ), score( 0 )
 {
     srand(4564523);
@@ -15,7 +15,7 @@ Game2048::Game2048(Genetic& genetic, QObject *parent)
 Game2048::~Game2048()
 { }
 
-int Game2048::loop()
+GameResult Game2048::loop()
 {
     addTile();
     while( true )
@@ -31,16 +31,18 @@ int Game2048::loop()
         waitKey();
 
         if (!moved) //nn makes wrong move
-            return score;
+            return {score, GameResult::WRONG_MOVE};
     }
 //    string s = "Game Over!";
 //    if( win ) s = "You've made it!";
 //    std::cout << s << endl << endl;
 
-    if( win )
+    if( win ) {
         std::cout << "Wow!" << std::endl;
+        return {score, GameResult::WIN};
+    }
 
-    return score;
+    return {score, GameResult::GAME_OVER};
 }
 
 void Game2048::drawBoard()

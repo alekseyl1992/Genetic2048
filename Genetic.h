@@ -24,7 +24,9 @@ public:
     std::vector<double> geneticFieldToInput(const GeneticField& field);
 
     int getCurrentChromosomeId() const;
-    const Pool& getPopulation() const;
+    Pool getPopulation() const;
+
+    void mutateCurrent();
 
 private:
     int populationSize;

@@ -78,9 +78,9 @@ void MainWindow::renderField(Game2048::Board board) {
     ui->fieldView->repaint();
 }
 
-void MainWindow::renderStats(const Pool& pool) {
+void MainWindow::renderStats(Pool pool) {
     for (size_t chromosomeId = 0; chromosomeId < pool.size(); ++chromosomeId) {
-        const Chromosome &chromosome = pool[chromosomeId];
+        Chromosome chromosome = pool[chromosomeId];
 
         auto fitnessItem = statsModel->item(chromosomeId, 0);
         fitnessItem->setText(QString::number(chromosome.fitness));

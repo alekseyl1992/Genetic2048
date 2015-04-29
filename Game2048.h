@@ -9,6 +9,12 @@ enum movDir { UP, DOWN, LEFT, RIGHT, MOV_COUNT };
 
 class Genetic;
 
+struct GameResult {
+    int score;
+    enum Reason {GAME_OVER, WRONG_MOVE, WIN};
+    Reason reason;
+};
+
 class tile
 {
 public:
@@ -31,7 +37,7 @@ public:
     Game2048(Genetic& genetic, QObject *parent = 0);
     ~Game2048();
 
-    int loop();
+    GameResult loop();
 
 private:
     Genetic& genetic;

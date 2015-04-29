@@ -38,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
     }
     ui->statsView->setModel(statsModel);
 
-    //qRegisterMetaType<Field>("Field");
+    qRegisterMetaType<Game2048::Board>("Game2048::Board");
     qRegisterMetaType<Pool>("Pool");
 
     workerThread = new WorkerThread(chromosomesCount, this);
@@ -53,9 +53,15 @@ MainWindow::MainWindow(QWidget *parent) :
                      &QCheckBox::stateChanged,
                      this,
                      &MainWindow::renderCheckboxStateChanged);
+
+    // enable rendering
+    QObject::connect(workerThread,
+                    &WorkerThread::fieldChanged,
+                    this,
+                    &MainWindow::renderField);
 }
 
-void MainWindow::renderField(Board board) {
+void MainWindow::renderField(Game2048::Board board) {
 
     for(int j = 0; j < Game2048::fieldHeight; ++j) {
         for(int i = 0; i < Game2048::fieldWidth; ++i) {
@@ -64,6 +70,8 @@ void MainWindow::renderField(Board board) {
             auto val = board[i][j].val;
             if (val != 0)
                 item->setText(QString::number(val));
+            else
+                item->setText("");
         }
     }
 
@@ -83,7 +91,7 @@ void MainWindow::renderStats(const Pool& pool) {
 
 void MainWindow::renderCheckboxStateChanged(int state)
 {
-    if (state == 0) {
+    if (state == Qt::CheckState::Checked) {
         QObject::connect(workerThread,
                         &WorkerThread::fieldChanged,
                         this,

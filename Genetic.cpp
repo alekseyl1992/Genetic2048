@@ -14,6 +14,8 @@ Genetic::Genetic(int populationSize, double mutationProbability)
       mutationProbability(mutationProbability),
       currentChromosomeId(-1) {
 
+    assert(mutationProbability < 1);
+
     for (size_t i = 1; i < nnSizes.size(); ++i) {
         auto prevLayerSize = nnSizes[i - 1];
         auto layerSize = nnSizes[i];
@@ -29,7 +31,7 @@ void Genetic::init() {
     currentChromosomeId = 0;
 }
 
-movDir Genetic::activate(Board board) {
+movDir Genetic::activate(const Game2048::Board& board) {
     GeneticField geneticField = createGeneticField(board);
 //    printGeneticField(geneticField);
 
@@ -89,7 +91,7 @@ void Genetic::step(int score) {
     }
 }
 
-GeneticField Genetic::createGeneticField(Board board) {
+GeneticField Genetic::createGeneticField(const Game2048::Board& board) {
     // project field
     GeneticField geneticField(Game2048::fieldHeight);
     for (int i = 0; i < Game2048::fieldHeight; ++i) {
@@ -134,8 +136,8 @@ void Genetic::newGeneration() {
     
     size_t middle = pool.size() / 7;
     for (size_t i = middle; i < pool.size(); ++i) {
-        auto& c1 = pool[randABexp(0, middle)];
-        auto& c2 = pool[randABexp(0, middle)];
+        auto& c1 = pool[randAB(0, middle)];
+        auto& c2 = pool[randAB(0, middle)];
 
         pool[i] = Chromosome::crossover(c1, c2);
         pool[i].mutate(mutationProbability);

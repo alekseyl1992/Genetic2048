@@ -1,51 +1,60 @@
 #include "Game2048.h"
+#include "Genetic.h"
 #include <iostream>
+#include <thread>
+#include <chrono>
 using namespace std;
 
 Game2048::Game2048(Genetic& genetic, QObject *parent)
-    : QObject(parent)
+    : genetic(genetic), QObject(parent),
+      done( false ), win( false ), moved( true ), score( 0 )
 {
-
+    srand(4564523);
 }
 
 Game2048::~Game2048()
-{
-
-}
+{ }
 
 int Game2048::loop()
 {
     addTile();
     while( true )
     {
-        if( moved ) addTile();
+        if (moved)
+            addTile();
+
         drawBoard();
-        if( done ) break;
+
+        if (done)
+            break;
+
         waitKey();
+
+        if (!moved) //nn makes wrong move
+            return score;
     }
-    string s = "Game Over!";
-    if( win ) s = "You've made it!";
-    std::cout << s << endl << endl;
+//    string s = "Game Over!";
+//    if( win ) s = "You've made it!";
+//    std::cout << s << endl << endl;
+
+    if( win )
+        std::cout << "Wow!" << std::endl;
 
     return score;
 }
 
 void Game2048::drawBoard()
 {
-    emit render(board);
+    //emit render(board);
 }
 
 void Game2048::waitKey()
 {
-    moved = false; char c;
-    std::cout << "(W)Up (S)Down (A)Left (D)Right "; std::cin >> c; c &= 0x5F;
-    switch( c )
-    {
-    case 'W': move( UP );break;
-    case 'A': move( LEFT ); break;
-    case 'S': move( DOWN ); break;
-    case 'D': move( RIGHT );
-    }
+    moved = false;
+
+    auto button = genetic.activate(board);
+    move(button);
+
     for( int y = 0; y < 4; y++ )
         for( int x = 0; x < 4; x++ )
             board[x][y].blocked = false;
@@ -135,6 +144,9 @@ void Game2048::moveHori(int x, int y, int d)
 
 void Game2048::move(movDir d)
 {
+    //using namespace std::literals;
+    //std::this_thread::sleep_for(1s);
+
     switch( d )
     {
     case UP:

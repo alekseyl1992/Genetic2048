@@ -17,7 +17,6 @@ public:
     bool blocked;
 };
 
-using Board = tile[4][4];
 
 class Game2048 : public QObject
 {
@@ -26,12 +25,16 @@ public:
     static constexpr int fieldWidth = 4;
     static constexpr int fieldHeight = 4;
 
+    using Board = std::array<std::array<tile, Game2048::fieldHeight>, Game2048::fieldWidth>;
+
+
     Game2048(Genetic& genetic, QObject *parent = 0);
     ~Game2048();
 
     int loop();
 
 private:
+    Genetic& genetic;
     Board board;
     bool win, done, moved;
     uint score;
@@ -46,7 +49,7 @@ private:
     void move( movDir d );
 
 signals:
-    void render(Board board);
+    void render(const Board& board);
 
 public slots:
 };

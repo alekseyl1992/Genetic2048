@@ -8,7 +8,7 @@ WorkerThread::WorkerThread(int populationSize, QObject *parent) :
 
 void WorkerThread::run()
 {
-    Genetic genetic(populationSize, 1./.1000);
+    Genetic genetic(populationSize, 1./10.);
     genetic.init();
 
     loop = true;
@@ -26,10 +26,10 @@ void WorkerThread::stop()
 }
 
 int WorkerThread::gameRun(Genetic& genetic) {
-    Game2048 game(genetic, this);
+    Game2048 game(genetic);
     QObject::connect(&game,
                      &Game2048::render,
-                     [&] (Board board) {
+                     [&] (const Game2048::Board& board) {
         emit fieldChanged(board);
     });
 

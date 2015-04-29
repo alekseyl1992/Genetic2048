@@ -21,7 +21,7 @@ protected:
     virtual void run();
 
 signals:
-    void fieldChanged(Board board);
+    void fieldChanged(Game2048::Board board);
     void statsChanged(const Pool& pool);
 
 public slots:

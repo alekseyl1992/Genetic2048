@@ -31,7 +31,7 @@ private:
     WorkerThread *workerThread;
 
 public slots:
-    void renderField(Board board);
+    void renderField(Game2048::Board board);
     void renderStats(const Pool &pool);
     void renderCheckboxStateChanged(int state);
 };

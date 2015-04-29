@@ -12,14 +12,14 @@ class Genetic {
 public:
     Genetic(int populationSize = 20, double mutationProbability = 1./50.);
 
-    movDir activate(Board board);
+    movDir activate(const Game2048::Board& board);
     void init();
     void step(int score);
 
     void newGeneration();
     void newGeneration2();
 
-    GeneticField createGeneticField(Board board);
+    GeneticField createGeneticField(const Game2048::Board& board);
     void printGeneticField(GeneticField &geneticField);
     std::vector<double> geneticFieldToInput(const GeneticField& field);
 

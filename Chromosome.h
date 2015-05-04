@@ -7,7 +7,7 @@
 using Genome = std::vector<double>;
 struct Chromosome {
     Genome genome;
-    double fitness = 0;
+    int fitness = 0;
 
     Chromosome(size_t size);
     Chromosome clone();

@@ -1,6 +1,7 @@
 #ifndef TETRIS_GENETIC_H
 #define TETRIS_GENETIC_H
 #include <vector>
+#include <boost/circular_buffer.hpp>
 #include "Game2048.h"
 #include "Chromosome.h"
 
@@ -35,6 +36,9 @@ private:
     double mutationProbability;
     Pool pool;
     int currentChromosomeId;
+
+    static constexpr int historySize = 10;
+    boost::circular_buffer<double> buttonsHistory;
 
     int maxScores = 0;
 };

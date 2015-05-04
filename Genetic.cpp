@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include <memory>
+#include <array>
 #include <algorithm>
 #include "Game2048.h"
 #include "Genetic.h"
@@ -9,7 +10,10 @@
 
 Genetic::Genetic(int populationSize, double mutationProbability)
     : populationSize(populationSize),
-      nnSizes({Game2048::fieldWidth * Game2048::fieldHeight, 10, 10, MOV_COUNT}),
+      buttonsHistory(historySize * movDir::MOV_COUNT),
+      nnSizes({Game2048::fieldWidth * Game2048::fieldHeight
+              + historySize * movDir::MOV_COUNT,
+              10, 10, MOV_COUNT}),
       chromosomeSize(0),
       mutationProbability(mutationProbability),
       currentChromosomeId(-1) {
@@ -21,6 +25,8 @@ Genetic::Genetic(int populationSize, double mutationProbability)
         auto layerSize = nnSizes[i];
         chromosomeSize += (prevLayerSize + 1) * layerSize;
     }
+
+    buttonsHistory.resize(historySize * movDir::MOV_COUNT, 0);
 }
 
 void Genetic::init() {
@@ -41,6 +47,11 @@ movDir Genetic::activate(const Game2048::Board& board) {
     typedef std::shared_ptr<vec> vec_ptr;
 
     vec input = geneticFieldToInput(geneticField);
+    // append buttons history to input vector
+    for (auto button: buttonsHistory) {
+        input.push_back(button);
+    }
+
     vec_ptr layer_p = nullptr;
     vec_ptr prevLayer_p = std::make_shared<vec>(input);
 
@@ -67,6 +78,13 @@ movDir Genetic::activate(const Game2048::Board& board) {
 
     auto result = std::max_element(layer_p->begin(), layer_p->end());
     int buttonId = std::distance(layer_p->begin(), result);
+
+    std::array<double, movDir::MOV_COUNT> historyEntry;
+    historyEntry.fill(0);
+    historyEntry[buttonId] = 1;
+    for (auto button: historyEntry) {
+        buttonsHistory.push_back(button);
+    }
 
     return (movDir) buttonId;
 }
@@ -139,10 +157,48 @@ void Genetic::newGeneration() {
         return lhs.fitness > rhs.fitness;
     });
     
-    size_t middle = pool.size() / 7;
+    for (size_t chromosomeId = 0; chromosomeId < pool.size(); ++chromosomeId) {
+        Chromosome chromosome = pool[chromosomeId];
+
+        std::cout << chromosome.fitness << "\t";
+    }
+    std::cout << std::endl;
+
+    size_t middle = pool.size() / 2;
+
+    // are we at local maximum?
+    int maxClassLen = 0;
+    int maxClassBegin = 0;
+
+    int curClassLen = 1;
+    int curClassBegin = 0;
+
+    int curFitness = pool[0].fitness;
+    for (int i = 1; i < middle; ++i) {
+        if (pool[i].fitness == curFitness) {
+            ++curClassLen;
+        } else {
+            if (curClassLen > maxClassLen) {
+                maxClassLen = curClassLen;
+                maxClassBegin = curClassBegin;
+            }
+
+            curClassLen = 1;
+            curClassBegin = i;
+            curFitness = pool[i].fitness;
+        }
+    }
+
+    if (maxClassLen > middle / 5) {
+        // kill that class
+        for (size_t i = maxClassBegin; i < maxClassBegin + maxClassLen; ++i) {
+            pool[i] = Chromosome::createRandom(chromosomeSize);
+        }
+    }
+
     for (size_t i = middle; i < pool.size(); ++i) {
-        auto& c1 = pool[randABexp(0, pool.size())];
-        auto& c2 = pool[randABexp(0, pool.size())];
+        auto& c1 = pool[randAB(0, middle)];
+        auto& c2 = pool[randAB(middle, pool.size())];
 
         pool[i] = Chromosome::crossover(c1, c2);
         pool[i].mutate(mutationProbability);

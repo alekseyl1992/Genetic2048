@@ -9,22 +9,13 @@ WorkerThread::WorkerThread(int populationSize, QObject *parent) :
 
 void WorkerThread::run()
 {
-    Genetic genetic(populationSize, 1./100.);
+    Genetic genetic(populationSize, 1./2000.);
     genetic.init();
 
     loop = true;
     while(loop) {
         int result = gameRun(genetic);
         //emit statsChanged(genetic.getPopulation());
-
-        Pool pool = genetic.getPopulation();
-
-        for (size_t chromosomeId = 0; chromosomeId < pool.size(); ++chromosomeId) {
-            Chromosome chromosome = pool[chromosomeId];
-
-            std::cout << chromosome.fitness << "\t";
-        }
-        std::cout << std::endl;
 
         genetic.step(result);
     }
